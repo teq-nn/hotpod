@@ -10,31 +10,39 @@
         body {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid bg-dark p-3 px-5">
-        <div class="row mb-3">
-            <div class="col">
+    <div class="container-fluid bg-dark p-3 px-5 text-white">
+        <div class="row mb-3 g-3">
+            <div class="col-12 col-md-4">
                 <input type="text" class="form-control" id="appIdText" placeholder="JaaS App ID" aria-label="JaaS App ID">
             </div>
-            <div class="col">
+            <div class="col-12 col-md-4">
                 <input type="text" class="form-control" id="roomText" placeholder="Room" aria-label="Room">
             </div>
+            <div class="col-12 col-md-4">
+                <input type="text" class="form-control" id="hostText" placeholder="Host" aria-label="Host">
+            </div>
         </div>
-        <div class="row mb-3">
-            <div class="col">
+        <div class="row mb-3 g-3">
+            <div class="col-12">
                 <input type="text" class="form-control" id="jwtText" placeholder="JWT" aria-label="Token">
             </div>
         </div>
 
         <button type="button" class="btn btn-primary me-3" id="joinBtn">Join</button>
-        <button type="button" class="btn btn-primary me-3" id="leaveBtn">Leave</button>
+        <button type="button" class="btn btn-secondary" id="leaveBtn">Leave</button>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid py-3">
+        <div id="hostLabel" class="mb-2 fw-semibold">Host: n/a</div>
         <div id="meeting-grid" class="row"></div>
+    </div>
+    <div class="container-fluid pb-4">
+        <h2 class="h5">Participants</h2>
+        <ul id="participantList" class="list-group"></ul>
     </div>
     <script src="app.js" type="module"></script>
 </body>
