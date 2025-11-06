@@ -12,9 +12,45 @@
             flex-direction: column;
             height: 100vh;
         }
+
+        .consent-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .consent-dialog {
+            max-width: 420px;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+            padding: 1.5rem;
+        }
+
+        .level-meter {
+            height: 0.75rem;
+        }
     </style>
 </head>
 <body>
+    <div class="consent-backdrop" id="consentOverlay">
+        <div class="consent-dialog">
+            <h2 class="h5 mb-3">Einverständnis erforderlich</h2>
+            <p class="mb-2">Damit wir Ihnen das beste Audioerlebnis bieten können, speichern wir Ihre ausgewählte Eingabegerätekonfiguration lokal im Browser (Session Storage) für die Dauer dieser Sitzung.</p>
+            <p class="mb-3">Bitte bestätigen Sie, dass Sie damit einverstanden sind.</p>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="" id="consentCheckbox">
+                <label class="form-check-label" for="consentCheckbox">
+                    Ich stimme der lokalen Zwischenspeicherung meiner Geräteauswahl zu.
+                </label>
+            </div>
+            <button type="button" class="btn btn-primary w-100" id="consentConfirmBtn" disabled>Bestätigen</button>
+        </div>
+    </div>
     <div class="container-fluid bg-dark p-3 px-5">
         <div class="row mb-3">
             <div class="col">
@@ -27,6 +63,22 @@
         <div class="row mb-3">
             <div class="col">
                 <input type="text" class="form-control" id="jwtText" placeholder="JWT" aria-label="Token">
+            </div>
+        </div>
+        <div class="row mb-3 align-items-end g-3">
+            <div class="col-sm-6">
+                <label for="micSelect" class="form-label text-white-50">Mikrofon</label>
+                <select class="form-select" id="micSelect" aria-label="Mikrofonauswahl"></select>
+                <div class="form-text text-white-50" id="micStatusText"></div>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label text-white-50">Pegeltest</label>
+                <div class="progress level-meter" role="progressbar" aria-label="Mikrofonpegel">
+                    <div class="progress-bar" id="micLevelBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="col-sm-3 d-flex">
+                <button type="button" class="btn btn-outline-light w-100 align-self-end" id="micTestBtn">Pegeltest starten</button>
             </div>
         </div>
 
