@@ -1,3 +1,5 @@
+import { RecordingManager } from './recordingManager.js';
+
 // App global state.
 //
 
@@ -7,6 +9,8 @@ const state = {
     jwt: '',
     conference: undefined,
 };
+
+const recordingManager = new RecordingManager();
 
 // Form elements.
 //
@@ -63,6 +67,8 @@ leaveBtn.onclick = async () => {
 
 
 const handleTrackAdded = track => {
+    recordingManager.registerTrack(track);
+
     if (track.getType() === 'video') {
         const meetingGrid = document.getElementById('meeting-grid');
         const videoNode = document.createElement('video');
@@ -84,6 +90,8 @@ const handleTrackAdded = track => {
 };
 
 const handleTrackRemoved = track => {
+    recordingManager.unregisterTrack(track);
+
     track.dispose();
     document.getElementById(track.getId())?.remove();
 };
@@ -130,8 +138,8 @@ async function connect() {
     c.on(
         JitsiMeetJS.events.conference.USER_LEFT,
         onUserLeft);
-
     state.conference = c;
+    recordingManager.attachConference(c);
 }
 
 // Leave the room and proceed to cleanup.
@@ -140,9 +148,15 @@ async function leave() {
         await state.conference.dispose();
     }
 
+    recordingManager.detachConference();
     state.conference = undefined;
 }
 
 // Initialize library.
 JitsiMeetJS.init();
 console.log(`using LJM version ${JitsiMeetJS.version}!`);
+
+window.hotpodRecording = {
+    start: timestamp => recordingManager.start(timestamp),
+    stop: timestamp => recordingManager.stop(timestamp),
+};
