@@ -16,6 +16,14 @@ const roomEl = document.getElementById('roomText');
 const jwtEl = document.getElementById('jwtText');
 const joinBtn = document.getElementById('joinBtn');
 const leaveBtn = document.getElementById('leaveBtn');
+const browserWarningEl = document.getElementById('browserWarning');
+
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+if (isSafari) {
+    browserWarningEl.textContent = 'Safari is currently disabled for this demo. Please switch to a Chromium-based browser or Firefox to continue.';
+    browserWarningEl.hidden = false;
+}
 
 function updateJoinForm() {
     // In a meeting.
@@ -29,7 +37,9 @@ function updateJoinForm() {
         appIdEl.disabled = false;
         roomEl.disabled = false;
         jwtEl.disabled = false;
-        joinBtn.disabled = state.appId.length === 0 || state.room.length === 0 || state.jwt.length === 0;
+        const hasFormValues = state.appId.length > 0 && state.room.length > 0 && state.jwt.length > 0;
+
+        joinBtn.disabled = !hasFormValues || isSafari;
         leaveBtn.disabled = true;
     }
 }
@@ -52,6 +62,10 @@ jwtEl.onchange = () => {
 }
 
 joinBtn.onclick = async () => {
+    if (isSafari) {
+        return;
+    }
+
     await connect();
     updateJoinForm();
 };

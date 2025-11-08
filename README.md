@@ -48,6 +48,20 @@ Now let's dive right in!
 
 ----
 
+## Usage guidelines and current limitations
+
+- **Obtain explicit participant consent.** The host is responsible for presenting the
+  consent dialog before anyone joins recording-enabled meetings and for reiterating that
+  they are acting in the dedicated host role throughout the session.
+- **Browser support.** Safari currently lacks full support for the demo mixing flow. The
+  in-app join controls are disabled in Safari and the recommended fallback is to direct
+  participants to a Chromium-based browser (Chrome, Edge, Brave) or Firefox instead.
+- **Post-processing.** Multitrack mastering, normalization, and mastering-grade effects are
+  out of scope for the demo. Export your raw stems and perform the final mixdown in an
+  external Digital Audio Workstation (DAW) such as Logic Pro, Ableton, or Reaper.
+
+----
+
 In order to get started working with LJM the first step is to load and initialize
 the library.
 
