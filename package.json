@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node scripts/prepare-env.js && esbuild src/index.js --bundle --watch --format=esm --outfile=www/app.js --serve --servedir=www"
+    "prepare:env": "node scripts/prepare-env.js",
+    "start": "npm run prepare:env && esbuild src/index.js --bundle --watch --format=esm --outfile=www/app.js --serve --servedir=www"
   },
   "author": "",
   "license": "Apache-2.0",

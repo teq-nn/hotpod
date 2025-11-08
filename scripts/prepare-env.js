@@ -12,23 +12,32 @@ function parseEnv(raw) {
         return result;
     }
 
-    const lines = raw.split(/\r?\n/);
-    for (const line of lines) {
+    for (const line of raw.split(/\r?\n/)) {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('#')) {
             continue;
         }
+
         const eqIdx = trimmed.indexOf('=');
         if (eqIdx === -1) {
             continue;
         }
+
         const key = trimmed.slice(0, eqIdx).trim();
         let value = trimmed.slice(eqIdx + 1).trim();
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\''))) {
+
+        if (!key) {
+            continue;
+        }
+
+        if ((value.startsWith('"') && value.endsWith('"'))
+            || (value.startsWith("'") && value.endsWith("'"))) {
             value = value.slice(1, -1);
         }
+
         result[key] = value;
     }
+
     return result;
 }
 
@@ -37,31 +46,61 @@ function readEnvFile() {
         if (!fs.existsSync(ENV_PATH)) {
             return {};
         }
+
         const raw = fs.readFileSync(ENV_PATH, 'utf8');
         return parseEnv(raw);
-    } catch (err) {
-        console.error('Failed to read .env file', err);
+    } catch (error) {
+        console.warn('[prepare-env] Failed to read .env file:', error);
         return {};
     }
 }
 
-function buildConfig(env) {
-    const config = {};
-    Object.keys(env).forEach(key => {
-        if (key.startsWith(PREFIX)) {
-            config[key] = env[key];
-        }
-    });
-    return config;
+function collectPrefixedEntries(source) {
+    return Object.fromEntries(
+        Object.entries(source)
+            .filter(([ key ]) => key.startsWith(PREFIX))
+    );
+}
+
+function buildConfig() {
+    const fromFile = readEnvFile();
+    const fromProcess = collectPrefixedEntries(process.env);
+
+    return {
+        ...fromFile,
+        ...fromProcess,
+    };
+}
+
+function ensureOutputDir() {
+    const dir = path.dirname(OUTPUT_PATH);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
 }
 
 function writeConfig(config) {
     const serialized = JSON.stringify(config, null, 2);
     const banner = '// Auto-generated from .env by scripts/prepare-env.js\n';
     const content = `${banner}window.__HOT_POD_ENV__ = ${serialized};\n`;
-    fs.writeFileSync(OUTPUT_PATH, content);
+
+    ensureOutputDir();
+
+    try {
+        const existing = fs.existsSync(OUTPUT_PATH)
+            ? fs.readFileSync(OUTPUT_PATH, 'utf8')
+            : null;
+
+        if (existing === content) {
+            return;
+        }
+
+        fs.writeFileSync(OUTPUT_PATH, content, 'utf8');
+        console.log('[prepare-env] Wrote', path.relative(PROJECT_ROOT, OUTPUT_PATH));
+    } catch (error) {
+        console.error('[prepare-env] Failed to write env-config.js:', error);
+        process.exitCode = 1;
+    }
 }
 
-const envVars = readEnvFile();
-const config = buildConfig(envVars);
-writeConfig(config);
+writeConfig(buildConfig());
