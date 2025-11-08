@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid bg-dark p-3 px-5">
+    <div class="container-fluid bg-dark p-3 px-5 text-white">
         <div class="row mb-3">
             <div class="col">
                 <input type="text" class="form-control" id="appIdText" placeholder="JaaS App ID" aria-label="JaaS App ID">
@@ -32,10 +32,25 @@
 
         <button type="button" class="btn btn-primary me-3" id="joinBtn">Join</button>
         <button type="button" class="btn btn-primary me-3" id="leaveBtn">Leave</button>
+        <div class="mt-3" id="statusBanners">
+            <div id="connectionStatusBanner" class="alert mb-2" role="status"></div>
+            <div id="recordingStatusBanner" class="alert mb-0" role="status"></div>
+        </div>
+        <div class="mt-4">
+            <label for="localAudioLevelBar" class="form-label">Local audio level</label>
+            <div class="progress" role="progressbar" aria-label="Local audio level" aria-valuemin="0" aria-valuemax="100">
+                <div id="localAudioLevelBar" class="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="mt-3" id="remoteAudioLevels" hidden>
+            <h6>Remote audio levels</h6>
+            <div class="row g-2" id="remoteAudioLevelGrid"></div>
+        </div>
     </div>
     <div class="container-fluid">
         <div id="meeting-grid" class="row"></div>
     </div>
+    <script src="env-config.js"></script>
     <script src="app.js" type="module"></script>
 </body>
 </html>
