@@ -31,7 +31,13 @@
         </div>
 
         <button type="button" class="btn btn-primary me-3" id="joinBtn">Join</button>
-        <button type="button" class="btn btn-primary me-3" id="leaveBtn">Leave</button>
+        <button type="button" class="btn btn-secondary me-3" id="leaveBtn">Leave</button>
+
+        <div id="hostControls" class="d-inline-flex align-items-center gap-2 mt-3 mt-md-0 ms-md-3" hidden>
+            <button type="button" class="btn btn-success" id="startBroadcastBtn">Start Broadcast</button>
+            <button type="button" class="btn btn-danger" id="stopBroadcastBtn">Stop Broadcast</button>
+            <span class="text-light" id="broadcastStatus" role="status"></span>
+        </div>
     </div>
     <div class="container-fluid">
         <div id="meeting-grid" class="row"></div>
