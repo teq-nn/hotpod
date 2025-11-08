@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid bg-dark p-3 px-5">
+    <div class="container-fluid bg-dark p-3 px-5 text-white">
         <div class="row mb-3">
             <div class="col">
                 <input type="text" class="form-control" id="appIdText" placeholder="JaaS App ID" aria-label="JaaS App ID">
@@ -32,6 +32,18 @@
 
         <button type="button" class="btn btn-primary me-3" id="joinBtn">Join</button>
         <button type="button" class="btn btn-primary me-3" id="leaveBtn">Leave</button>
+        <div class="alert alert-danger mt-3" id="browserWarning" role="alert" hidden></div>
+    </div>
+    <div class="container my-4">
+        <div class="alert alert-info" role="status">
+            <h2 class="h5">Session checklist</h2>
+            <ul class="mb-0">
+                <li><strong>Host responsibilities:</strong> Ensure you are logged in with the host role and display the consent dialog before anyone joins.</li>
+                <li><strong>Participant consent:</strong> Verbally reiterate that the session is being captured before starting to record or distribute tracks.</li>
+                <li><strong>Safari support:</strong> Safari is currently unsupported for multitrack capture. Ask attendees to switch to a Chromium-based browser or Firefox.</li>
+                <li><strong>Mixing limitations:</strong> This demo is for capture only. Plan to finish editing and mastering in an external DAW such as Logic Pro, Ableton Live, or Reaper.</li>
+            </ul>
+        </div>
     </div>
     <div class="container-fluid">
         <div id="meeting-grid" class="row"></div>
