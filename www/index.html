@@ -3,51 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lib-jitsi-meet-demo</title>
+    <title>Hotpod Local Recording PoC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script>
+        window.HOTPOD_CONFIG = {
+            domain: '8x8.vc',
+            defaultAppId: '',
+            defaultJwt: '',
+            telemetry: { enabled: false }
+        };
+    </script>
     <script src="https://8x8.vc/libs/lib-jitsi-meet.min.js"></script>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        main {
+            flex: 1 1 auto;
+        }
+        .hotpod-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(12px);
+        }
+        .level-meter {
+            height: 8px;
+            width: 100%;
+            border-radius: 9999px;
+            background: rgba(148, 163, 184, 0.25);
+            overflow: hidden;
+            position: relative;
+        }
+        .level-meter span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #22d3ee, #0ea5e9);
+            transition: width 150ms ease-out;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 9999px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-idle { background: #6366f1; }
+        .status-recording { background: #22d3ee; }
+        .status-stopping { background: #fbbf24; }
+        .status-exported { background: #22c55e; }
+        .track-list-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .track-list-item h5 {
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #e2e8f0;
+        }
+        .badge-role-host {
+            background: rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+        }
+        .badge-role-guest {
+            background: rgba(94, 234, 212, 0.15);
+            color: #5eead4;
+        }
+        .badge-track-local {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+        }
+        .badge-track-remote {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+        .hotpod-link {
+            color: #38bdf8;
+        }
+        .hotpod-link:hover {
+            color: #f472b6;
+        }
+        .recording-banner {
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #e0f2fe;
+        }
+        .recording-banner.recording {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: rgba(248, 113, 113, 0.5);
+            color: #fee2e2;
+        }
+        .telemetry-table {
+            font-size: 0.85rem;
         }
     </style>
 </head>
-<body>
-    <div class="container-fluid bg-dark p-3 px-5 text-white">
-        <div class="row mb-3">
-            <div class="col">
-                <input type="text" class="form-control" id="appIdText" placeholder="JaaS App ID" aria-label="JaaS App ID">
+<body class="d-flex flex-column">
+    <header class="py-4 border-bottom border-secondary border-opacity-25">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="h3 mb-0">Hotpod – Local Multitrack Capture</h1>
+                <p class="mb-0 text-secondary">Browser-based studio recording over lib-jitsi-meet.</p>
             </div>
-            <div class="col">
-                <input type="text" class="form-control" id="roomText" placeholder="Room" aria-label="Room">
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col">
-                <input type="text" class="form-control" id="jwtText" placeholder="JWT" aria-label="Token">
+            <div class="text-end small">
+                <span class="text-secondary">Invite link base:</span>
+                <code id="inviteBase" class="d-block text-light"></code>
             </div>
         </div>
-
-        <button type="button" class="btn btn-primary me-3" id="joinBtn">Join</button>
-        <button type="button" class="btn btn-primary me-3" id="leaveBtn">Leave</button>
-        <div class="alert alert-danger mt-3" id="browserWarning" role="alert" hidden></div>
-    </div>
-    <div class="container my-4">
-        <div class="alert alert-info" role="status">
-            <h2 class="h5">Session checklist</h2>
-            <ul class="mb-0">
-                <li><strong>Host responsibilities:</strong> Ensure you are logged in with the host role and display the consent dialog before anyone joins.</li>
-                <li><strong>Participant consent:</strong> Verbally reiterate that the session is being captured before starting to record or distribute tracks.</li>
-                <li><strong>Safari support:</strong> Safari is currently unsupported for multitrack capture. Ask attendees to switch to a Chromium-based browser or Firefox.</li>
-                <li><strong>Mixing limitations:</strong> This demo is for capture only. Plan to finish editing and mastering in an external DAW such as Logic Pro, Ableton Live, or Reaper.</li>
-            </ul>
+    </header>
+    <main class="container py-4" id="app"></main>
+    <footer class="py-3 border-top border-secondary border-opacity-25">
+        <div class="container text-secondary small">
+            <p class="mb-1">Known limitations: no uploader/Cloud sync, Safari support is experimental, multitrack mastering occurs externally in your DAW.</p>
+            <p class="mb-0">This PoC requires explicit consent from all participants prior to capture. Ensure compliance with your local regulations.</p>
         </div>
-    </div>
-    <div class="container-fluid">
-        <div id="meeting-grid" class="row"></div>
-    </div>
+    </footer>
     <script src="app.js" type="module"></script>
 </body>
 </html>
